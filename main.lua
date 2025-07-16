@@ -1,11 +1,8 @@
 lg = love.graphics
-local width, height = love.window.getDesktopDimensions()
-love.window.setMode(width, height, {
-    fullscreen = false,
-    resizable = false,  
-    borderless = false, 
-    vsync = true
-})
+
+
+-- Snap to (0,0) so it fills the top-left corner
+love.window.setPosition(0, 0)
 window = {
     w = lg:getWidth(),
     h = lg:getHeight()
