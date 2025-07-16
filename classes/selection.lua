@@ -15,7 +15,7 @@ local selection = {
         y = 0
     },
     modalBoxDragging = false,
-    properties = {},
+    child = {},
     selectedProperty = {
         name = "name",
         value = 0,
@@ -64,18 +64,55 @@ function selection:update(dt)
 
     end
 
+    local newChild = objects:getCurrentChild()
+    if newChild and newChild ~= self.child then
+        self.child = newChild
+        self:modalBoxReset()
+    end
+
 end
 
+function selection:modalBoxReset()
+    self.modalBox = false
+    self.modalBoxData.x = GLOBAL_VARS.leftTaskBar.x + 35 + GLOBAL_VARS.canvas.width / 2
+    self.modalBoxData.y = 10 + GLOBAL_VARS.canvas.height / 2 - 100
+    closeButton.x = self.modalBoxData.x + self.modalBoxData.width - self.modalBoxData.height / 5
+    closeButton.y = self.modalBoxData.y
+    closeButton.hover.x = closeButton.x - 3
+    closeButton.hover.y = closeButton.y - 3
+    closeButton:recall()
+end
 function selection:draw()
-
     -- Properties Box
     lg.setColor(0.3, 0.3, 0.3)
     lg.rectangle("fill", self.x, self.y, self.width, self.height, 10, 10)
 
-    for i, v in pairs(self.properties) do
+    mx, my = love.mouse.getPosition()
 
+    y = self.y
+    if self.child and self.child.properties then
+        print("PROPS EXIST " .. #self.child.properties)
+        for i = 1, #self.child.properties do
+            local prop = self.child.properties[i]
+            local itemY = y + (16 * i)
+
+            if mx > self.x + 5 and mx < self.x + self.width - 10 and my > itemY and my < itemY + 14 then
+                lg.setColor(0.5, 0.5, 0.5)
+                if love.mouse.isDown(1) then
+                    self.selectedProperty = prop
+                    self:modalBoxReset()
+                    self.modalBox = true
+                end
+            else
+                
+                lg.setColor(0.4, 0.4, 0.4)
+            end
+
+            lg.rectangle("fill", self.x + 5, itemY, self.width - 10, 14)
+            lg.setColor(1, 1, 1)
+            lg.print(prop.name or "Unnamed", self.x + 8, itemY + 2)
+        end
     end
-
 end
 
 function selection:drawModals()
@@ -113,7 +150,6 @@ function selection:mousepressed(x, y, button)
             self.modalBoxDragging = true
             self.dragPosition.x = x - self.modalBoxData.x
             self.dragPosition.y = y - self.modalBoxData.y
-            print("ENTERED")
         end
     end
 
@@ -123,7 +159,6 @@ function selection:mousereleased(x, y, button)
 
     if self.modalBoxDragging then
         self.modalBoxDragging = false
-        print("exited")
     end
 end
 return selection

@@ -5,11 +5,27 @@ local objects = {
     height = GLOBAL_VARS.leftTaskBar.height / 3 - 5,
 
     children = {{
-        name = "name",
-        properties = {}
+        name = "obj1",
+        properties = {{
+            name = "Health",
+            value = 100,
+            type = "num"
+        }, {
+            name = "Speed",
+            value = 10,
+            type = "num"
+        }}
     }, {
-        name = "name",
-        properties = {}
+        name = "obj2",
+        properties = {{
+            name = "Power",
+            value = 50,
+            type = "num"
+        }, {
+            name = "Defense",
+            value = 20,
+            type = "num"
+        }}
     }},
 
     clickedChild = {}
@@ -24,6 +40,7 @@ function objects:update(dt)
 end
 
 function objects:getCurrentChild()
+    print(self.clickedChild.name)
     return self.clickedChild
 end
 
@@ -38,14 +55,17 @@ function objects:draw()
         local itemY = y + (16 * i)
         if mx > self.x + 5 and mx < self.x + self.width - 10 and my > itemY and my < itemY + 14 then
             lg.setColor(0.5, 0.5, 0.5)
-            if love.mouse.isDown() then
-                clickedChild = self.children[i]
+            if love.mouse.isDown(1) then
+                self.clickedChild = self.children[i]
             end
         else
             lg.setColor(0.4, 0.4, 0.4)
         end
 
+        objChild = self.children[i]
         lg.rectangle("fill", self.x + 5, y + (16 * i), self.width - 10, 14)
+        lg.setColor(1, 1, 1)
+        lg.print(objChild.name, self.x + 8, y + (16 * i) + 2)
     end
 
 end
