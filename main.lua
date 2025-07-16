@@ -53,7 +53,19 @@ function love.draw()
 
     selection:draw()
 
-    
+
     lg.setColor(cv.color)
     lg.rectangle("fill", cv.x, cv.y, cv.width, cv.height, 10, 10)
+
+
+    selection:drawModals()
+end
+
+
+function love.mousepressed(x, y, button)
+    selection:mousepressed(x, y, button)
+end
+
+function love.mousereleased(x, y, button)
+    selection:mousereleased(x, y, button)
 end
