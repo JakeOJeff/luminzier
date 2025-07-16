@@ -30,16 +30,20 @@ GLOBAL_VARS.canvas.y = 10
 Button = require 'library.button'
 
 
+local objects = require 'classes.objects'
 local selection = require 'classes.selection'
+
 
 function love.load()
     selection:load()
+    objects:load()
 
  
 end
 
 function love.update(dt)
     selection:update(dt)
+    objects:update(dt)
 
 end
 
@@ -54,6 +58,8 @@ function love.draw()
     lg.rectangle("fill", lTB.x, lTB.y, lTB.width, lTB.height)
 
     selection:draw()
+
+    objects:draw()
 
 
     lg.setColor(cv.color)
