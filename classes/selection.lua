@@ -10,6 +10,10 @@ local selection = {
         width = 400,
         height = 200
     },
+    dragPosition = {
+        x = 0,
+        y = 0
+    },
     modalBoxDragging = false,
     properties = {},
     selectedProperty = {
@@ -28,6 +32,13 @@ end
 
 function selection:update(dt)
 
+    if love.mouse.isDown(1) and self.modalBoxDragging then
+        print("WHOOP WHOOP")
+        mx, my = love.mouse.getPosition()
+
+        self.modalBoxData.x = mx - self.dragPosition.x
+        self.modalBoxData.y = my - self.dragPosition.y
+    end
 
 end
 
@@ -67,6 +78,9 @@ function selection:mousepressed(x, y, button)
     if x > self.modalBoxData.x and x < self.modalBoxData.x + self.modalBoxData.width and y > self.modalBoxData.y and y < self.modalBoxData.y + self.modalBoxData.height/5 and self.modalBox then
         if button == 1 then
             self.modalBoxDragging = true
+            self.dragPosition.x = x - self.modalBoxData.x
+            self.dragPosition.y = y - self.modalBoxData.y
+            print("ENTERED")
         end
     end
 
@@ -76,6 +90,7 @@ function selection:mousereleased(x, y, button)
 
     if self.modalBoxDragging then
         self.modalBoxDragging = false
+                    print("exited")
     end
 end
 return selection
