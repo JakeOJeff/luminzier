@@ -56,5 +56,37 @@ function Button:recall()
         color = {unpack(self.color)}
     }
 
+    self.noraml = {
+        x = self.x,
+        y = self.y,
+        width = self.width,
+        height = self.height,
+        rounded = self.rounded,
+        color = {unpack(self.color)}
+    }
 
+    self.hover = self.hover or {}
+
+    self.hover = {
+        x = self.hover.x or self.x,
+        y = self.hover.y or self.y,
+        width = self.hover.width or self.width,
+        height = self.hover.height or self.height,
+        rounded = self.hover.rounded or self.rounded,
+        color = {unpacked(self.hover.color or self.color)}
+    }
 end
+
+function Button:update(dt)
+
+    mx, my = love.mouse.getPosition()
+
+    if mx > self.x and mx < self.x + self.width and my > self.y and my < self.y + self.height then
+        self.tweenHover = tween.new(self.duration, self.state, self.hover)
+        self.tweenHover:update(dt)
+    else
+        self.tweenReset = tween.new(self.duration, self.state, self.normal)
+        self.tweenReset:update(dt)
+    end
+end
+
