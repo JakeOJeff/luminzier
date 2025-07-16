@@ -1,8 +1,6 @@
 lg = love.graphics
 
 
--- Snap to (0,0) so it fills the top-left corner
-love.window.setPosition(0, 0)
 window = {
     w = lg:getWidth(),
     h = lg:getHeight()
@@ -11,7 +9,7 @@ GLOBAL_VARS = {
     leftTaskBar = {
         x = 0,
         y = 0,
-        width = 50,
+        width = 0.25 * window.w,
         height = window.h
     }
 }
@@ -26,4 +24,9 @@ end
 
 function love.draw()
     -- Left Task Bar
+    local gV = GLOBAL_VARS
+    local lTB = gV.leftTaskBar
+
+    lg.setColor(0.7,0.7,0.7)
+    lg.rectangle("fill", lTB.x, lTB.y, lTB.width, lTB.height)
 end
