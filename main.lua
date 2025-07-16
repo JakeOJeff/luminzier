@@ -1,6 +1,11 @@
 lg = love.graphics
-love.window.setFullscreen(true, "desktop")
-
+local width, height = love.window.getDesktopDimensions()
+love.window.setMode(width, height, {
+    fullscreen = false,
+    resizable = false,  
+    borderless = false, 
+    vsync = true
+})
 window = {
     w = lg:getWidth(),
     h = lg:getHeight()
