@@ -25,7 +25,11 @@ GLOBAL_VARS = {
 GLOBAL_VARS.canvas.x = GLOBAL_VARS.leftTaskBar.x + GLOBAL_VARS.leftTaskBar.width + 10
 GLOBAL_VARS.canvas.y = 10
 
+
+local selection = require 'classes.selection'
+
 function love.load()
+    selection:load()
 
     
 
@@ -33,7 +37,7 @@ end
 
 function love.update(dt)
 
-
+    selection:update(dt)
 
 end
 
@@ -47,6 +51,9 @@ function love.draw()
     lg.setColor(0.5,0.5,0.5)
     lg.rectangle("fill", lTB.x, lTB.y, lTB.width, lTB.height)
 
+    selection:draw()
+
+    
     lg.setColor(cv.color)
     lg.rectangle("fill", cv.x, cv.y, cv.width, cv.height, 10, 10)
 end
