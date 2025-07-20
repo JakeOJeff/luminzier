@@ -22,6 +22,7 @@ local selection = {
         type = "num"
     }
 }
+local tween = require 'packages.tween'
 
 function selection:load()
 
@@ -44,6 +45,12 @@ function selection:load()
 
     closeButton.callback = function()
         self.modalBox = false
+    end
+
+    for _, child in ipairs(self.selectedProperty) do
+        child.color = {0.4, 0.4, 0.4}
+        child.tween = nil
+        child.isHovered = false
     end
 end
 
@@ -69,6 +76,16 @@ function selection:update(dt)
         self.child = newChild
         self:modalBoxReset()
     end
+    if self.child and self.child.properties then
+        for _, prop in ipairs(self.child.properties) do
+            if prop.tween then
+                local complete = prop.tween:update(dt)
+                if complete then
+                    prop.tween = nil
+                end
+            end
+        end
+    end
 
 end
 
@@ -92,26 +109,37 @@ function selection:draw()
     y = self.y
     if self.child and self.child.properties then
         print("PROPS EXIST " .. #self.child.properties)
-        for i = 1, #self.child.properties do
-            local prop = self.child.properties[i]
-            local itemY = y + (16 * i)
+        for i, prop in ipairs(self.child.properties) do
+            local itemY = y + (22 * i)
+            local isHovering = mx > self.x + 5 and mx < self.x + self.width - 10 and my > itemY and my < itemY + 20
 
-            if mx > self.x + 5 and mx < self.x + self.width - 10 and my > itemY and my < itemY + 14 then
-                lg.setColor(0.5, 0.5, 0.5)
-                if love.mouse.isDown(1) then
-                    self.selectedProperty = prop
-                    self:modalBoxReset()
-                    self.modalBox = true
-                end
-            else
-                
-                lg.setColor(0.4, 0.4, 0.4)
+            -- Init values if not yet defined
+            if not prop.color then
+                prop.color = {0.4, 0.4, 0.4}
+                prop.isHovered = false
+                prop.tween = nil
             end
 
-            lg.rectangle("fill", self.x + 5, itemY, self.width - 10, 14)
+            if isHovering and not prop.isHovered then
+                prop.isHovered = true
+                prop.tween = tween.new(0.2, prop.color, {0.5, 0.5, 0.5}, 'inOutQuad')
+            elseif not isHovering and prop.isHovered then
+                prop.isHovered = false
+                prop.tween = tween.new(0.2, prop.color, {0.4, 0.4, 0.4}, 'inOutQuad')
+            end
+
+            if isHovering and love.mouse.isDown(1) then
+                self.selectedProperty = prop
+                self:modalBoxReset()
+                self.modalBox = true
+            end
+
+            lg.setColor(prop.color)
+            lg.rectangle("fill", self.x + 5, itemY, self.width - 10, 20, 5, 5)
             lg.setColor(1, 1, 1)
             lg.print(prop.name or "Unnamed", self.x + 8, itemY + 2)
         end
+
     end
 end
 
