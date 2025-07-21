@@ -232,13 +232,6 @@ function objects:mousepressed(x, y, button)
                     }
                 end
 
-                local count = 0
-                for _, child in ipairs(self.children) do
-                    if child.name:match("^Rectangle") then
-                        count = count + 1
-                    end
-                end
-                newChild.name = item.type .. " " .. (count + 1)
 
                 table.insert(self.children, cloneItem(item))
                 self:reloadChildClasses()
