@@ -68,11 +68,13 @@ function love.draw()
 
 
     selection:drawModals()
+    objects:drawAddItemModal()
 end
 
 
 function love.mousepressed(x, y, button)
     selection:mousepressed(x, y, button)
+    objects:mousepressed(x, y, button)
 end
 
 function love.mousereleased(x, y, button)

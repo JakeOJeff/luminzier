@@ -58,7 +58,6 @@ function selection:update(dt)
 
     closeButton:update(dt)
     if love.mouse.isDown(1) and self.modalBoxDragging then
-        print("WHOOP WHOOP")
         mx, my = love.mouse.getPosition()
 
         self.modalBoxData.x = mx - self.dragPosition.x

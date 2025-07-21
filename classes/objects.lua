@@ -1,9 +1,19 @@
-
 local objects = {
     x = 5,
     y = GLOBAL_VARS.leftTaskBar.height / 3 * 1,
     width = GLOBAL_VARS.leftTaskBar.width - 10,
     height = GLOBAL_VARS.leftTaskBar.height / 3 - 5,
+
+    itemsList = {
+        rectangle = require 'items.rectangle'
+    },
+    addItemModalBox = false,
+    addItemModalBoxData = {
+        x = GLOBAL_VARS.leftTaskBar.width + 5,
+        y = GLOBAL_VARS.leftTaskBar.height / 3 * 1,
+        width = GLOBAL_VARS.leftTaskBar.width,
+        height = 30
+    },
 
     children = {{
         name = "obj1",
@@ -37,15 +47,40 @@ local lg = love.graphics
 local mouseReleased = true
 
 function objects:load()
+
+    addItemButton = Button:new()
+    addItemButton.text = "+"
+    addItemButton.x = 5
+    addItemButton.y = objects.y - 20
+    addItemButton.width = objects.width
+    addItemButton.height = 20
+    addItemButton.color = {0.3, 0.3, 0.3}
+
+    addItemButton.hover.x = 5
+    addItemButton.hover.y = objects.y - 20
+    addItemButton.hover.width = objects.width
+    addItemButton.hover.height = 20
+    addItemButton.hover.color = {0.4, 0.4, 0.4}
+
+    addItemButton:recall()
+    addItemButton.callback = function()
+        self.addItemModalBox = true
+    end
     for _, child in ipairs(self.children) do
         child.color = {0.4, 0.4, 0.4}
         child.tween = nil
         child.isHovered = false
         child.deleteIsHovered = false
     end
+
+    for i = 1, #self.itemsList do
+        self.addItemModalBoxData.height = 40 * i
+    end
 end
 
 function objects:update(dt)
+    addItemButton:update(dt)
+
     local mx, my = love.mouse.getPosition()
     local toRemove = nil
     local clicked = nil
@@ -60,11 +95,10 @@ function objects:update(dt)
         end
 
         local itemY = self.y + (22 * i)
-        local isHovering = mx > self.x + 5 and mx < self.x + self.width - 10
-            and my > itemY and my < itemY + 20
+        local isHovering = mx > self.x + 5 and mx < self.x + self.width - 10 and my > itemY and my < itemY + 20
 
-        local isHoveringDelete = mx > self.x + self.width - 25 and mx < self.x + self.width - 10
-            and my > itemY and my < itemY + 20
+        local isHoveringDelete = mx > self.x + self.width - 25 and mx < self.x + self.width - 10 and my > itemY and my <
+                                     itemY + 20
 
         child.deleteIsHovered = isHoveringDelete
 
@@ -92,9 +126,7 @@ function objects:update(dt)
     end
 end
 
-
 function objects:getCurrentChild()
-    print(self.clickedChild.name)
     return self.clickedChild
 end
 
@@ -102,13 +134,13 @@ function objects:draw()
     lg.setColor(0.3, 0.3, 0.3)
     lg.rectangle("fill", self.x, self.y, self.width, self.height, 10, 10)
 
+    addItemButton:draw()
+
     local mx, my = love.mouse.getPosition()
     local y = self.y
-
     for i, child in ipairs(self.children) do
         local itemY = y + (22 * i)
-        local isHovering = mx > self.x + 5 and mx < self.x + self.width - 10
-            and my > itemY and my < itemY + 20
+        local isHovering = mx > self.x + 5 and mx < self.x + self.width - 10 and my > itemY and my < itemY + 20
 
         -- Trigger tween animations on hover
         if isHovering and not child.isHovered then
@@ -136,6 +168,28 @@ function objects:draw()
         lg.setColor(child.deleteIsHovered and {1, 0.2, 0.2} or {1, 1, 1})
         lg.print("X", self.x + self.width - 20, itemY + 2)
     end
+end
+
+function objects:drawAddItemModal()
+    if self.addItemModalBox then
+        lg.setColor(0.3, 0.3, 0.3)
+        lg.rectangle("fill", self.addItemModalBoxData.x, self.addItemModalBoxData.y, self.addItemModalBoxData.width,
+            self.addItemModalBoxData.height, 10, 10)
+
+        local i = 0
+        for key, item in pairs(self.itemsList) do
+            i = i + 1
+            lg.setColor(0.5, 0.5, 0.5)
+            lg.rectangle("fill", self.addItemModalBoxData.x + 5, self.addItemModalBoxData.y + 30 * i, self.addItemModalBoxData.width - 10, 30)
+            lg.setColor(1, 1, 1)
+            lg.print(key, self.addItemModalBoxData.x + 10, self.addItemModalBoxData.y + 30 * i)
+        end
+    end
+end
+
+
+function objects:mousepressed(x, y, button)
+    addItemButton:mousepressed(x, y, button)
 end
 
 return objects
