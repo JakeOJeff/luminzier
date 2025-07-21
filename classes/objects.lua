@@ -18,30 +18,30 @@ local objects = {
     },
 
     children = { -- initial items
-    {
-        name = "obj1",
-        properties = {{
-            name = "Health",
-            value = 100,
-            type = "num"
-        }, {
-            name = "Speed",
-            value = 10,
-            type = "num"
-        }}
-    }, {
-        name = "obj2",
-        properties = {{
-            name = "Power",
-            value = 50,
-            type = "num"
-        }, {
-            name = "Defense",
-            value = 20,
-            type = "num"
-        }}
-    }},
-
+        -- {
+        --     name = "obj1",
+        --     properties = {{
+        --         name = "Health",
+        --         value = 100,
+        --         type = "num"
+        --     }, {
+        --         name = "Speed",
+        --         value = 10,
+        --         type = "num"
+        --     }}
+        -- }, {
+        --     name = "obj2",
+        --     properties = {{
+        --         name = "Power",
+        --         value = 50,
+        --         type = "num"
+        --     }, {
+        --         name = "Defense",
+        --         value = 20,
+        --         type = "num"
+        --     }}
+        -- }
+    },
     clickedChild = {}
 }
 
@@ -168,6 +168,10 @@ function objects:draw()
             child.isHovered = false
             child.tween = tween.new(0.2, child.color, {0.4, 0.4, 0.4}, 'inOutQuad')
         end
+        if self.clickedChild == child then
+            lg.setColor(1, 1, 1, 0.5)
+            lg.rectangle("fill", self.x + 5 - 3, itemY - 3, self.width - 10 + 6, 26, 5, 5)
+        end
 
         lg.setColor(child.color)
         lg.rectangle("fill", self.x + 5, itemY, self.width - 10, 20, 5, 5)
@@ -231,7 +235,6 @@ function objects:mousepressed(x, y, button)
                         deleteIsHovered = false
                     }
                 end
-
 
                 table.insert(self.children, cloneItem(item))
                 self:reloadChildClasses()
