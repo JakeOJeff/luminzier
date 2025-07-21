@@ -8,7 +8,7 @@ local objects = {
     scrollSpeed = 40,
     maxScroll = 0,
 
-    itemsList = {require 'items.rectangle'},
+    itemsList = {require 'items.rectangle', require 'items.circle'},
     addItemModalBox = false,
     addItemModalBoxData = {
         x = GLOBAL_VARS.leftTaskBar.width + 5,

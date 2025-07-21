@@ -15,17 +15,24 @@ function drawElements:allDraw()
         local obj = objects.children[i]
         print(obj.name)
         self:checkRect(obj)
+        self:checkCirc(obj)
     end
 end
 
 function drawElements:checkRect(obj)
     if obj.name == "Rectangle" then
-        print("YESS")
         local props = unpackProperties(obj.properties)
 
         love.graphics.setColor(props.color)
         love.graphics.rectangle(props.mode,cv.x + props.x,cv.y + props.y, props.width, props.height)
     end
 end
+function drawElements:checkCirc(obj)
+    if obj.name == "Circle" then
+        local props = unpackProperties(obj.properties)
 
+        love.graphics.setColor(props.color)
+        love.graphics.circle(props.mode,cv.x + props.radius + props.x,cv.y+ props.radius + props.y, props.radius)
+    end
+end
 return drawElements
