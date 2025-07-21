@@ -25,7 +25,15 @@ GLOBAL_VARS = {
 GLOBAL_VARS.canvas.x = GLOBAL_VARS.leftTaskBar.x + GLOBAL_VARS.leftTaskBar.width + 10
 GLOBAL_VARS.canvas.y = 10
 
+-- GLOBAL FUNCS
 
+function inBox(mx, my, x, y, width, height)
+    if mx > x and mx < x + width and my > y and my < y + height then
+        return true
+    end
+    return false
+
+end
 -- Libs
 Button = require 'library.button'
 

@@ -1,6 +1,6 @@
 local rectangle = {
     type = "rectangle",
-    name = "",
+    name = "this shit my name",
     properties = {
         x = 0,
         y = 0,

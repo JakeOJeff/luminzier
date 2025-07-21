@@ -4,9 +4,7 @@ local objects = {
     width = GLOBAL_VARS.leftTaskBar.width - 10,
     height = GLOBAL_VARS.leftTaskBar.height / 3 - 5,
 
-    itemsList = {
-        rectangle = require 'items.rectangle'
-    },
+    itemsList = {require 'items.rectangle'},
     addItemModalBox = false,
     addItemModalBoxData = {
         x = GLOBAL_VARS.leftTaskBar.width + 5,
@@ -66,6 +64,17 @@ function objects:load()
     addItemButton.callback = function()
         self.addItemModalBox = true
     end
+    self:reloadChildClasses()
+
+    local count = 0
+    for _ in pairs(self.itemsList) do
+        count = count + 1
+    end
+    self.addItemModalBoxData.height = 20 + (20 * count) + (5 * (count - 1))
+
+end
+
+function objects:reloadChildClasses()
     for _, child in ipairs(self.children) do
         child.color = {0.4, 0.4, 0.4}
         child.tween = nil
@@ -73,11 +82,7 @@ function objects:load()
         child.deleteIsHovered = false
     end
 
-    for i = 1, #self.itemsList do
-        self.addItemModalBoxData.height = 40 * i
-    end
 end
-
 function objects:update(dt)
     addItemButton:update(dt)
 
@@ -174,22 +179,45 @@ function objects:drawAddItemModal()
     if self.addItemModalBox then
         lg.setColor(0.3, 0.3, 0.3)
         lg.rectangle("fill", self.addItemModalBoxData.x, self.addItemModalBoxData.y, self.addItemModalBoxData.width,
-            self.addItemModalBoxData.height, 10, 10)
+            self.addItemModalBoxData.height, 5, 5)
 
         local i = 0
+        local itemY = self.addItemModalBoxData.y + 5
         for key, item in pairs(self.itemsList) do
-            i = i + 1
             lg.setColor(0.5, 0.5, 0.5)
-            lg.rectangle("fill", self.addItemModalBoxData.x + 5, self.addItemModalBoxData.y + 30 * i, self.addItemModalBoxData.width - 10, 30)
+            lg.rectangle("fill", self.addItemModalBoxData.x + 5, itemY + (20 * i) + 5,
+                self.addItemModalBoxData.width - 10, 20, 5, 5)
             lg.setColor(1, 1, 1)
-            lg.print(key, self.addItemModalBoxData.x + 10, self.addItemModalBoxData.y + 30 * i)
+            lg.print(item.type, self.addItemModalBoxData.x + 10, itemY + (20 * i) + 5)
+
+            i = i + 1
         end
     end
 end
 
-
 function objects:mousepressed(x, y, button)
+
+    local box = self.addItemModalBoxData
+    local insideBox = inBox(x, y, box.x, box.y, box.width, box.height)
+
+    if not insideBox and self.addItemModalBox then
+        self.addItemModalBox = false
+    end
+    local i = 0
+    local itemY = self.addItemModalBoxData.y + 5
+    for key, item in pairs(self.itemsList) do
+
+        mx, my = x, y
+        if inBox(mx, my, self.addItemModalBoxData.x + 5, itemY + (20 * i) + 5, self.addItemModalBoxData.width - 10, 20) then
+            if button == 1 then
+                table.insert(self.children, item)
+                self:reloadChildClasses()
+            end
+        end
+        i = i + 1
+    end
     addItemButton:mousepressed(x, y, button)
+
 end
 
 return objects
