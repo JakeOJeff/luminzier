@@ -134,8 +134,9 @@ function objects:update(dt)
         mouseReleased = true
     end
 end
-
 function objects:wheelmoved(x, y)
+    print("Scroll Y:", y) -- debug print
+
     self.scrollY = self.scrollY - y * self.scrollSpeed
     self.scrollY = math.max(0, math.min(self.scrollY, self.maxScroll))
 end
@@ -157,6 +158,7 @@ function objects:draw()
     local y = self.y
     for i, child in ipairs(self.children) do
         local itemY = y + (22 * i) - self.scrollY
+
         local isHovering = mx > self.x + 5 and mx < self.x + self.width - 10 and my > itemY and my < itemY + 20
 
         if isHovering and not child.isHovered then
@@ -195,6 +197,7 @@ function objects:drawAddItemModal()
             lg.setColor(1, 1, 1)
             lg.print(item.type, self.addItemModalBoxData.x + 10, itemY + (20 * i) + 5)
             i = i + 1
+
         end
     end
 end
@@ -228,6 +231,14 @@ function objects:mousepressed(x, y, button)
                         deleteIsHovered = false
                     }
                 end
+
+                local count = 0
+                for _, child in ipairs(self.children) do
+                    if child.name:match("^Rectangle") then
+                        count = count + 1
+                    end
+                end
+                newChild.name = item.type .. " " .. (count + 1)
 
                 table.insert(self.children, cloneItem(item))
                 self:reloadChildClasses()

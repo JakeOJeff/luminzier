@@ -88,3 +88,7 @@ end
 function love.mousereleased(x, y, button)
     selection:mousereleased(x, y, button)
 end
+
+function love.wheelmoved(x, y)
+    objects:wheelmoved(x, y)
+end
