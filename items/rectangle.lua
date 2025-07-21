@@ -1,16 +1,15 @@
 local rectangle = {
-    type = "rectangle",
-    name = "this shit my name",
+    type = "Rectangle",
+    name = "Rectangle",
     properties = {
-        x = 0,
-        y = 0,
-        width = 0,
-        height = 0,
-        rx = 0,
-        mode = "fill",
-        color = {0.5, 0.5, 0.5}
+        { name = "x", value = 0, type = "num" },
+        { name = "y", value = 0, type = "num" },
+        { name = "width", value = 50, type = "num" },
+        { name = "height", value = 50, type = "num" },
+        { name = "rx", value = 0, type = "num" },
+        { name = "mode", value = "fill", type = "string" },
+        { name = "color", value = {0.5, 0.5, 0.5}, type = "color" }
     }
-
 }
 
 return rectangle

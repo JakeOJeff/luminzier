@@ -210,10 +210,34 @@ function objects:mousepressed(x, y, button)
         mx, my = x, y
         if inBox(mx, my, self.addItemModalBoxData.x + 5, itemY + (20 * i) + 5, self.addItemModalBoxData.width - 10, 20) then
             if button == 1 then
-                table.insert(self.children, item)
+                -- Clone the item safely
+                local function cloneItem(item)
+                    local propsCopy = {}
+                    for _, prop in ipairs(item.properties) do
+                        local copied = {
+                            name = prop.name,
+                            value = prop.value,
+                            type = prop.type
+                        }
+                        table.insert(propsCopy, copied)
+                    end
+
+                    return {
+                        name = item.name,
+                        properties = propsCopy,
+                        color = {0.4, 0.4, 0.4},
+                        tween = nil,
+                        isHovered = false,
+                        deleteIsHovered = false
+                    }
+                end
+
+                local newChild = cloneItem(item)
+                table.insert(self.children, newChild)
                 self:reloadChildClasses()
             end
         end
+
         i = i + 1
     end
     addItemButton:mousepressed(x, y, button)
