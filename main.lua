@@ -42,6 +42,8 @@ objects = require 'classes.objects'
 selection = require 'classes.selection'
 
 
+drawElements = require 'classes.drawElements'
+
 function love.load()
     selection:load()
     objects:load()
@@ -74,6 +76,7 @@ function love.draw()
     lg.setColor(cv.color)
     lg.rectangle("fill", cv.x, cv.y, cv.width, cv.height, 10, 10)
 
+    drawElements:allDraw()
 
     selection:drawModals()
     objects:drawAddItemModal()
