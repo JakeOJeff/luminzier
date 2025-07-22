@@ -26,7 +26,13 @@ GLOBAL_VARS.canvas.x = GLOBAL_VARS.leftTaskBar.x + GLOBAL_VARS.leftTaskBar.width
 GLOBAL_VARS.canvas.y = 10
 
 -- GLOBAL FUNCS
-
+function unpackProperties(propList)
+    local props = {}
+    for _, prop in ipairs(propList) do
+        props[prop.name] = prop.value
+    end
+    return props
+end
 function inBox(mx, my, x, y, width, height)
     if mx > x and mx < x + width and my > y and my < y + height then
         return true

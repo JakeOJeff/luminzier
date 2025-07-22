@@ -1,13 +1,7 @@
 local drawElements = {}
 cv = GLOBAL_VARS.canvas
 
-local function unpackProperties(propList)
-    local props = {}
-    for _, prop in ipairs(propList) do
-        props[prop.name] = prop.value
-    end
-    return props
-end
+
 
 function drawElements:allDraw()
     for i = 1, #objects.children do

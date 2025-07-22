@@ -8,6 +8,10 @@ local objects = {
     scrollSpeed = 40,
     maxScroll = 0,
 
+    isDraggingChild = false,
+    draggingChild = nil,
+    dragOffsetY = 0,
+
     itemsList = {require 'items.rectangle', require 'items.circle'},
     addItemModalBox = false,
     addItemModalBoxData = {
@@ -117,8 +121,12 @@ function objects:update(dt)
                 toRemove = i
             elseif isHovering then
                 clicked = child
+                self.dragOffsetY = itemY - my -- calculate only once on press
+                self.isDraggingChild = true
+                self.draggingChild = child
             end
         end
+
     end
 
     if toRemove then
@@ -151,7 +159,12 @@ function objects:update(dt)
         mouseReleased = false
     else
         mouseReleased = true
+        if self.isDraggingChild then
+            self.isDraggingChild = false
+            self.draggingChild = nil
+        end
     end
+
 end
 function objects:wheelmoved(x, y)
     print("Scroll Y:", y) -- debug print
@@ -196,6 +209,7 @@ function objects:draw()
     local y = self.y
     for i, child in ipairs(self.children) do
         local itemY = y + (22 * i) - self.scrollY
+        local itemX = self.x + 5
 
         local isHovering = mx > self.x + 5 and mx < self.x + self.width - 10 and my > itemY and my < itemY + 20
 
@@ -206,19 +220,21 @@ function objects:draw()
             child.isHovered = false
             child.tween = tween.new(0.2, child.color, {0.4, 0.4, 0.4}, 'inOutQuad')
         end
-        if self.clickedChild == child then
+        if self.isDraggingChild and self.draggingChild == child then
+            itemY = my + self.dragOffsetY
+
             lg.setColor(1, 1, 1, 0.5)
-            lg.rectangle("fill", self.x + 5 - 3, itemY - 3, self.width - 10 + 6, 26, 5, 5)
+            lg.rectangle("fill", itemX + 5 - 3, itemY - 3, self.width - 10 + 6, 26, 5, 5)
         end
 
         lg.setColor(child.color)
-        lg.rectangle("fill", self.x + 5, itemY, self.width - 10, 20, 5, 5)
+        lg.rectangle("fill", itemX, itemY, self.width - 10, 20, 5, 5)
 
         lg.setColor(1, 1, 1)
-        lg.print(child.name, self.x + 8, itemY + 2)
+        lg.print(child.name, itemX + 8, itemY + 2)
 
         lg.setColor(child.deleteIsHovered and {1, 0.2, 0.2} or {1, 1, 1})
-        lg.print("X", self.x + self.width - 20, itemY + 2)
+        lg.print("X", itemX + self.width - 20, itemY + 2)
     end
 
     lg.setScissor() -- Reset clipping
