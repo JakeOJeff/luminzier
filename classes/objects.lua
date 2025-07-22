@@ -278,35 +278,37 @@ function objects:mousepressed(x, y, button)
         self.addItemModalBox = false
     end
 
-    local i = 0
-    local itemY = self.addItemModalBoxData.y + 5
-    for _, item in pairs(self.itemsList) do
-        if inBox(x, y, self.addItemModalBoxData.x + 5, itemY + (20 * i) + 5, self.addItemModalBoxData.width - 10, 20) then
-            if button == 1 then
-                local function cloneItem(item)
-                    local propsCopy = {}
-                    for _, prop in ipairs(item.properties) do
-                        table.insert(propsCopy, {
-                            name = prop.name,
-                            value = prop.value,
-                            type = prop.type
-                        })
+    if self.addItemModalBox then
+        local i = 0
+        local itemY = self.addItemModalBoxData.y + 5
+        for _, item in pairs(self.itemsList) do
+            if inBox(x, y, self.addItemModalBoxData.x + 5, itemY + (20 * i) + 5, self.addItemModalBoxData.width - 10, 20) then
+                if button == 1 then
+                    local function cloneItem(item)
+                        local propsCopy = {}
+                        for _, prop in ipairs(item.properties) do
+                            table.insert(propsCopy, {
+                                name = prop.name,
+                                value = prop.value,
+                                type = prop.type
+                            })
+                        end
+                        return {
+                            name = item.name,
+                            properties = propsCopy,
+                            color = {0.4, 0.4, 0.4},
+                            tween = nil,
+                            isHovered = false,
+                            deleteIsHovered = false
+                        }
                     end
-                    return {
-                        name = item.name,
-                        properties = propsCopy,
-                        color = {0.4, 0.4, 0.4},
-                        tween = nil,
-                        isHovered = false,
-                        deleteIsHovered = false
-                    }
-                end
 
-                table.insert(self.children, cloneItem(item))
-                self:reloadChildClasses()
+                    table.insert(self.children, cloneItem(item))
+                    self:reloadChildClasses()
+                end
             end
+            i = i + 1
         end
-        i = i + 1
     end
 
     addItemButton:mousepressed(x, y, button)

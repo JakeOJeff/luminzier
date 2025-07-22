@@ -171,6 +171,12 @@ function selection:mousepressed(x, y, button)
         closeButton:mousepressed(x, y, button)
 
     end
+
+    cv = GLOBAL_VARS.canvas
+    if not self.modalBox and inBox(x, y, cv.x, cv.y, cv.width, cv.height) then
+        objects.clickedChild = nil
+        self.child = nil
+    end
     if x > self.modalBoxData.x and x < self.modalBoxData.x + self.modalBoxData.width and y > self.modalBoxData.y and y <
         self.modalBoxData.y + self.modalBoxData.height / 5 and self.modalBox then
         if button == 1 then
