@@ -75,7 +75,8 @@ function objects:load()
     for _ in pairs(self.itemsList) do
         count = count + 1
     end
-    self.addItemModalBoxData.height = 20 + (20 * count) + (5 * (count - 1))
+    self.addItemModalBoxData.height = 10 + (20 + 5) * count
+
 end
 
 function objects:reloadChildClasses()
@@ -91,6 +92,7 @@ end
 
 function objects:update(dt)
     addItemButton:update(dt)
+    self.maxScroll = math.max(0, (#self.children * 22) - self.height)
 
     local mx, my = love.mouse.getPosition()
     local toRemove = nil
@@ -126,6 +128,24 @@ function objects:update(dt)
         self:reloadChildClasses()
     elseif clicked then
         self.clickedChild = clicked
+
+        -- Auto-scroll to make the clicked item visible
+        for i, child in ipairs(self.children) do
+            if child == clicked then
+                local itemTop = self.y + (22 * (i - 1)) - self.scrollY
+                local itemBottom = itemTop + 20
+
+                if itemTop < self.y then
+                    -- Scroll up to reveal item
+                    self.scrollY = math.max(0, 22 * (i - 1))
+                elseif itemBottom > self.y + self.height then
+                    -- Scroll down to reveal item
+                    self.scrollY = math.min(22 * (i - 1) - (self.height - 22), self.maxScroll)
+                end
+
+                break
+            end
+        end
     end
 
     if love.mouse.isDown(1) then
@@ -139,6 +159,25 @@ function objects:wheelmoved(x, y)
 
     self.scrollY = self.scrollY - y * self.scrollSpeed
     self.scrollY = math.max(0, math.min(self.scrollY, self.maxScroll))
+end
+function objects:scrollToChild(target)
+    -- Always update maxScroll before any scroll calculation
+    self.maxScroll = math.max(0, (#self.children * 22) - self.height)
+
+    for i, child in ipairs(self.children) do
+        if child == target then
+            local itemTop = self.y + (22 * (i - 1)) - self.scrollY
+            local itemBottom = itemTop + 20
+
+            -- Adjust scrollY only if needed
+            if itemTop < self.y then
+                self.scrollY = math.max(0, 22 * (i - 1))
+            elseif itemBottom > self.y + self.height then
+                self.scrollY = math.min(22 * (i - 1) - (self.height - 22), self.maxScroll)
+            end
+            break
+        end
+    end
 end
 
 function objects:getCurrentChild()
@@ -192,16 +231,43 @@ function objects:drawAddItemModal()
         lg.rectangle("fill", self.addItemModalBoxData.x, self.addItemModalBoxData.y, self.addItemModalBoxData.width,
             self.addItemModalBoxData.height, 5, 5)
 
-        local i = 0
-        local itemY = self.addItemModalBoxData.y + 5
-        for _, item in pairs(self.itemsList) do
-            lg.setColor(0.5, 0.5, 0.5)
-            lg.rectangle("fill", self.addItemModalBoxData.x + 5, itemY + (20 * i) + 5,
-                self.addItemModalBoxData.width - 10, 20, 5, 5)
-            lg.setColor(1, 1, 1)
-            lg.print(item.type, self.addItemModalBoxData.x + 10, itemY + (20 * i) + 5)
-            i = i + 1
+        local mx, my = love.mouse.getPosition()
+        local itemYStart = self.addItemModalBoxData.y + 5
+        local spacing = 5
 
+        for i, item in ipairs(self.itemsList) do
+            -- Assign default states if not already set
+            if not item.color then
+                item.color = {0.4, 0.4, 0.4}
+                item.isHovered = false
+                item.tween = nil
+            end
+
+            local itemY = itemYStart + (i - 1) * (20 + spacing)
+            local isHovering = inBox(mx, my, self.addItemModalBoxData.x + 5, itemY, self.addItemModalBoxData.width - 10,
+                20)
+
+            if isHovering and not item.isHovered then
+                item.isHovered = true
+                item.tween = tween.new(0.2, item.color, {0.5, 0.5, 0.5}, 'inOutQuad')
+            elseif not isHovering and item.isHovered then
+                item.isHovered = false
+                item.tween = tween.new(0.2, item.color, {0.4, 0.4, 0.4}, 'inOutQuad')
+            end
+
+            if item.tween then
+                local done = item.tween:update(love.timer.getDelta())
+                if done then
+                    item.tween = nil
+                end
+            end
+
+            -- Draw modal item
+            lg.setColor(item.color)
+            lg.rectangle("fill", self.addItemModalBoxData.x + 5, itemY, self.addItemModalBoxData.width - 10, 20, 5, 5)
+
+            lg.setColor(1, 1, 1)
+            lg.print(item.type, self.addItemModalBoxData.x + 10, itemY + 2)
         end
     end
 end

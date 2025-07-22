@@ -34,6 +34,16 @@ function inBox(mx, my, x, y, width, height)
     return false
 
 end
+
+function inCircle(mx, my, x, y, radius)
+    local dist = math.sqrt( (y - my)^2 + (x - mx)^2 )
+
+    if dist < radius then
+        return true
+    end
+
+    return false
+end
 -- Libs
 Button = require 'library.button'
 
