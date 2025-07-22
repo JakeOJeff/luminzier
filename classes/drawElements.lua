@@ -10,10 +10,8 @@ local function unpackProperties(propList)
 end
 
 function drawElements:allDraw()
-    print(#objects.children)
     for i = 1, #objects.children do
         local obj = objects.children[i]
-        print(obj.name)
         self:checkRect(obj)
         self:checkCirc(obj)
     end

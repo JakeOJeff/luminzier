@@ -87,12 +87,11 @@ function objects:reloadChildClasses()
         child.deleteIsHovered = false
     end
 
-    self.maxScroll = math.max(0, (#self.children * 22) - self.height)
 end
 
 function objects:update(dt)
     addItemButton:update(dt)
-    self.maxScroll = math.max(0, (#self.children * 22) - self.height)
+    self.maxScroll = math.max(0, ((#self.children + 1) * 22) - self.height)
 
     local mx, my = love.mouse.getPosition()
     local toRemove = nil
@@ -140,7 +139,7 @@ function objects:update(dt)
                     self.scrollY = math.max(0, 22 * (i - 1))
                 elseif itemBottom > self.y + self.height then
                     -- Scroll down to reveal item
-                    self.scrollY = math.min(22 * (i - 1) - (self.height - 22), self.maxScroll)
+                    self.scrollY = math.min(22 * (i - 1) - (self.height + 22), self.maxScroll)
                 end
 
                 break

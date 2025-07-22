@@ -107,7 +107,6 @@ function selection:draw()
 
     y = self.y
     if self.child and self.child.properties then
-        print("PROPS EXIST " .. #self.child.properties)
         for i, prop in ipairs(self.child.properties) do
             local itemY = y + (22 * i)
             local isHovering = mx > self.x + 5 and mx < self.x + self.width - 10 and my > itemY and my < itemY + 20
