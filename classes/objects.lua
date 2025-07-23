@@ -125,11 +125,22 @@ function objects:update(dt)
                 toRemove = i
             elseif isHovering then
                 clicked = child
+                self.pendingDrag = true
+                self.dragStartX, self.dragStartY = mx, my 
                 self.dragOffsetY = itemY - my
-                self.isDraggingChild = true
                 self.draggingChild = child
                 self.dragIndex = i
             end
+        end
+    end
+
+    if self.pendingDrag and love.mouse.isDown(1) then
+        local dx = math.abs(mx - self.dragStartX)
+        local dy = math.abs(my - self.dragStartY)
+
+        if dx > 4 and dy > 4 then
+            self.isDraggingChild = true
+            self.pendingDrag = false
         end
     end
 
