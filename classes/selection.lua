@@ -9,7 +9,9 @@ local selection = {
         y = 10 + GLOBAL_VARS.canvas.height / 2 - 100,
         width = 400,
         height = 200
+
     },
+    enableInput = false,
     dragPosition = {
         x = 0,
         y = 0
@@ -144,6 +146,7 @@ end
 function selection:drawModals()
 
     if self.modalBox then
+        self.enableInput = true
         lg.setColor(0, 0, 0, .5)
         lg.rectangle("fill", 0, 0, window.w, window.h)
 
@@ -158,8 +161,43 @@ function selection:drawModals()
         lg.setColor(1, 1, 1)
         lg.print(self.selectedProperty.name, self.modalBoxData.x + 20, self.modalBoxData.y + 20)
 
+        if self.modalError then
+            lg.setColor(1, 0, 0)
+            lg.print(self.modalErrorMessage, self.modalBoxData.x + 20, self.modalBoxData.y + 40)
+        end
+
+        lg.setColor(1, 1, 1)
+        lg.print(self.selectedProperty.name .. " Value : " .. self.selectedProperty.value, self.modalBoxData.x + 20,
+            self.modalBoxData.y + 60)
+
         -- Close Button
         closeButton:draw()
+    else
+        self.enableInput = false
+    end
+end
+
+function selection:textinput(t)
+    if self.enableInput then
+
+        if tonumber(self.selectedProperty.value) < 1 then
+            self.selectedProperty.value = t
+        else
+            self.selectedProperty.value = self.selectedProperty.value .. t
+        end
+
+    end
+end
+
+function selection:keypressed(key)
+
+    if key == "backspace" then
+        if tonumber(self.selectedProperty.value) < 10 then
+            self.selectedProperty.value = 0
+        else
+            self.selectedProperty.value = tonumber(string.sub(tostring(self.selectedProperty.value), 1, -2))
+
+        end
     end
 end
 
