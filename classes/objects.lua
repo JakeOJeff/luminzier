@@ -223,6 +223,10 @@ function objects:draw()
         if self.isDraggingChild and self.draggingChild == child then
             itemY = my + self.dragOffsetY
 
+            
+        end
+
+        if self.clickedChild == child then
             lg.setColor(1, 1, 1, 0.5)
             lg.rectangle("fill", itemX + 5 - 3, itemY - 3, self.width - 10 + 6, 26, 5, 5)
         end
