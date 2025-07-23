@@ -126,12 +126,13 @@ function objects:update(dt)
             elseif isHovering then
                 clicked = child
                 self.pendingDrag = true
-                self.dragStartX, self.dragStartY = mx, my 
+                self.dragStartX, self.dragStartY = mx, my
                 self.dragOffsetY = itemY - my
                 self.draggingChild = child
                 self.dragIndex = i
             end
         end
+
     end
 
     if self.pendingDrag and love.mouse.isDown(1) then
@@ -154,7 +155,7 @@ function objects:update(dt)
     end
 
     if not love.mouse.isDown(1) then
-        if self.draggingChild and self.dragIndex then
+        if self.isDraggingChild and self.draggingChild and self.dragIndex then
             local newIndex = math.max(1, math.min(#self.children, math.floor((my - self.y + self.scrollY) / 22) + 1))
 
             if newIndex ~= self.dragIndex then
@@ -163,13 +164,16 @@ function objects:update(dt)
                 self:reloadChildClasses()
             end
         end
+
         self.isDraggingChild = false
         self.draggingChild = nil
         self.dragIndex = nil
+        self.pendingDrag = false
         mouseReleased = true
     else
         mouseReleased = false
     end
+
 end
 
 function objects:wheelmoved(x, y)
