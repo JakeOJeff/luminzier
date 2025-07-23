@@ -11,6 +11,11 @@ local objects = {
     isDraggingChild = false,
     draggingChild = nil,
     dragOffsetY = 0,
+    dragIndex = nil,
+
+    pendingDrag = false,
+    dragStartX = 0,
+    dragStartY = 0,
 
     itemsList = {require 'items.rectangle', require 'items.circle'},
     addItemModalBox = false,
@@ -103,8 +108,7 @@ function objects:update(dt)
 
     for i, child in ipairs(self.children) do
         if child.tween then
-            local complete = child.tween:update(dt)
-            if complete then
+            if child.tween:update(dt) then
                 child.tween = nil
             end
         end
@@ -121,12 +125,12 @@ function objects:update(dt)
                 toRemove = i
             elseif isHovering then
                 clicked = child
-                self.dragOffsetY = itemY - my -- calculate only once on press
+                self.dragOffsetY = itemY - my
                 self.isDraggingChild = true
                 self.draggingChild = child
+                self.dragIndex = i
             end
         end
-
     end
 
     if toRemove then
@@ -135,37 +139,28 @@ function objects:update(dt)
         self:reloadChildClasses()
     elseif clicked then
         self.clickedChild = clicked
+        self:scrollToChild(clicked)
+    end
 
-        -- Auto-scroll to make the clicked item visible
-        for i, child in ipairs(self.children) do
-            if child == clicked then
-                local itemTop = self.y + (22 * (i - 1)) - self.scrollY
-                local itemBottom = itemTop + 20
+    if not love.mouse.isDown(1) then
+        if self.draggingChild and self.dragIndex then
+            local newIndex = math.max(1, math.min(#self.children, math.floor((my - self.y + self.scrollY) / 22) + 1))
 
-                if itemTop < self.y then
-                    -- Scroll up to reveal item
-                    self.scrollY = math.max(0, 22 * (i - 1))
-                elseif itemBottom > self.y + self.height then
-                    -- Scroll down to reveal item
-                    self.scrollY = math.min(22 * (i - 1) - (self.height + 22), self.maxScroll)
-                end
-
-                break
+            if newIndex ~= self.dragIndex then
+                local draggedItem = table.remove(self.children, self.dragIndex)
+                table.insert(self.children, newIndex, draggedItem)
+                self:reloadChildClasses()
             end
         end
-    end
-
-    if love.mouse.isDown(1) then
-        mouseReleased = false
-    else
+        self.isDraggingChild = false
+        self.draggingChild = nil
+        self.dragIndex = nil
         mouseReleased = true
-        if self.isDraggingChild then
-            self.isDraggingChild = false
-            self.draggingChild = nil
-        end
+    else
+        mouseReleased = false
     end
-
 end
+
 function objects:wheelmoved(x, y)
     print("Scroll Y:", y) -- debug print
 
@@ -207,6 +202,9 @@ function objects:draw()
 
     local mx, my = love.mouse.getPosition()
     local y = self.y
+    local draggedChild = nil
+    local draggedY = nil
+
     for i, child in ipairs(self.children) do
         local itemY = y + (22 * i) - self.scrollY
         local itemX = self.x + 5
@@ -220,25 +218,41 @@ function objects:draw()
             child.isHovered = false
             child.tween = tween.new(0.2, child.color, {0.4, 0.4, 0.4}, 'inOutQuad')
         end
+
+        -- if draggedY == itemY then
+        --     itemY = itemY + 22 - self.scrollY
+        -- end
         if self.isDraggingChild and self.draggingChild == child then
-            itemY = my + self.dragOffsetY
+            draggedChild = child
+            draggedY = my + self.dragOffsetY
+        else
+            if self.clickedChild == child then
+                lg.setColor(1, 1, 1, 0.5)
+                lg.rectangle("fill", itemX - 3, itemY - 3, self.width - 10 + 6, 26, 5, 5)
+            end
 
-            
+            lg.setColor(child.color)
+            lg.rectangle("fill", itemX, itemY, self.width - 10, 20, 5, 5)
+
+            lg.setColor(1, 1, 1)
+            lg.print(child.name, itemX + 8, itemY + 2)
+
+            lg.setColor(child.deleteIsHovered and {1, 0.2, 0.2} or {1, 1, 1})
+            lg.print("X", itemX + self.width - 20, itemY + 2)
         end
+    end
 
-        if self.clickedChild == child then
-            lg.setColor(1, 1, 1, 0.5)
-            lg.rectangle("fill", itemX + 5 - 3, itemY - 3, self.width - 10 + 6, 26, 5, 5)
-        end
-
-        lg.setColor(child.color)
-        lg.rectangle("fill", itemX, itemY, self.width - 10, 20, 5, 5)
+    -- Draw dragged item last (on top)
+    if draggedChild then
+        local itemX = self.x + 5
+        lg.setColor(draggedChild.color)
+        lg.rectangle("fill", itemX, draggedY, self.width - 10, 20, 5, 5)
 
         lg.setColor(1, 1, 1)
-        lg.print(child.name, itemX + 8, itemY + 2)
+        lg.print(draggedChild.name, itemX + 8, draggedY + 2)
 
-        lg.setColor(child.deleteIsHovered and {1, 0.2, 0.2} or {1, 1, 1})
-        lg.print("X", itemX + self.width - 20, itemY + 2)
+        lg.setColor(draggedChild.deleteIsHovered and {1, 0.2, 0.2} or {1, 1, 1})
+        lg.print("X", itemX + self.width - 20, draggedY + 2)
     end
 
     lg.setScissor() -- Reset clipping
