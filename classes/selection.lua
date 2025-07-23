@@ -177,13 +177,21 @@ function selection:drawModals()
     end
 end
 
+-- ERROR AREA
 function selection:textinput(t)
     if self.enableInput then
-
-        if tonumber(self.selectedProperty.value) < 1 then
-            self.selectedProperty.value = t
-        else
-            self.selectedProperty.value = self.selectedProperty.value .. t
+        local errorFlag = false
+        if not math.tointeger(self.selectedProperty.value) ~= nil then
+            errorFlag = true
+            self.modalError = true
+            self.modalErrorMessage = "Not a '(Integer/Number)' Format"
+        end
+        if not errorFlag then
+            if tonumber(self.selectedProperty.value) < 1 then
+                self.selectedProperty.value = t
+            else
+                self.selectedProperty.value = self.selectedProperty.value .. t
+            end
         end
 
     end
