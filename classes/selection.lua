@@ -167,8 +167,11 @@ function selection:drawModals()
         end
 
         lg.setColor(1, 1, 1)
-        lg.print(self.selectedProperty.name .. " Value : " .. self.selectedProperty.value, self.modalBoxData.x + 20,
+        if self.selectedProperty.type == "num" then
+            lg.print(self.selectedProperty.name .. " Value : " .. self.selectedProperty.value, self.modalBoxData.x + 20,
             self.modalBoxData.y + 60)
+        end
+        
 
         -- Close Button
         closeButton:draw()
@@ -178,7 +181,7 @@ function selection:drawModals()
 end
 
 function selection:textinput(t)
-    if self.enableInput then
+    if self.enableInput and self.selectedProperty.type == "num" then
         local errorFlag = false
 
         if tonumber(self.selectedProperty.value) == nil then
