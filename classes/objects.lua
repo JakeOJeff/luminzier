@@ -319,7 +319,7 @@ function objects:drawAddItemModal()
             lg.rectangle("fill", self.addItemModalBoxData.x + 5, itemY, self.addItemModalBoxData.width - 10, 20, 5, 5)
 
             lg.setColor(1, 1, 1)
-            lg.print(item.type, self.addItemModalBoxData.x + 10, itemY + 2)
+            lg.print(item.name, self.addItemModalBoxData.x + 10, itemY + 2)
         end
     end
 end
