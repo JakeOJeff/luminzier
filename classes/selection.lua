@@ -11,6 +11,7 @@ local selection = {
         height = 200
 
     },
+    tempVal = 0,
     enableInput = false,
     dragPosition = {
         x = 0,
@@ -132,6 +133,7 @@ function selection:draw()
                 self.selectedProperty = prop
                 self:modalBoxReset()
                 self.modalBox = true
+                self.tempVal = self.selectedProperty.value
             end
 
             lg.setColor(prop.color)
@@ -163,15 +165,29 @@ function selection:drawModals()
 
         if self.modalError then
             lg.setColor(1, 0, 0)
-            lg.print(self.modalErrorMessage, self.modalBoxData.x + 20, self.modalBoxData.y + 40)
-        end
+            local errorText = self.modalErrorMessage
+            local wrapWidth = self.modalBoxData.width - 40
+            local _, wrappedText = lg.getFont():getWrap(errorText, wrapWidth)
+            local errorHeight = #wrappedText * lg.getFont():getHeight()
 
-        lg.setColor(1, 1, 1)
-        if self.selectedProperty.type == "num" then
-            lg.print(self.selectedProperty.name .. " Value : " .. self.selectedProperty.value, self.modalBoxData.x + 20,
-            self.modalBoxData.y + 60)
+            -- Draw the wrapped error text
+            lg.printf(errorText, self.modalBoxData.x + 20, self.modalBoxData.y + 40, wrapWidth)
+
+            -- Now draw the value text BELOW the error text, using the height calculated
+            lg.setColor(1, 1, 1)
+            if self.selectedProperty.type == "num" then
+                local valueText = self.selectedProperty.name .. " Value : " .. self.tempVal
+                lg.printf(valueText, self.modalBoxData.x + 20, self.modalBoxData.y + 40 + errorHeight + 10, -- 10px padding between messages
+                    wrapWidth)
+            end
+        else
+            -- If no error, draw value at fixed location
+            lg.setColor(1, 1, 1)
+            if self.selectedProperty.type == "num" then
+                local valueText = self.selectedProperty.name .. " Value : " .. self.tempVal
+                lg.printf(valueText, self.modalBoxData.x + 20, self.modalBoxData.y + 60, self.modalBoxData.width - 40)
+            end
         end
-        
 
         -- Close Button
         closeButton:draw()
@@ -182,45 +198,66 @@ end
 
 function selection:textinput(t)
     if self.enableInput and self.selectedProperty.type == "num" then
-        local errorFlag = false
 
-        if tonumber(t) == nil then
-            errorFlag = true
-            self.modalError = true
-            self.modalErrorMessage = "Not a '(Number)' Format"
-        elseif tonumber(self.selectedProperty.value .. t) > 2450 then
-            errorFlag = true
-            self.modalError = true
-            self.modalErrorMessage = "Value exceeds limit ( >2450 )"
-        end
+        -- OLD FORMAT 
 
-        if not errorFlag then
-            -- Append or replace value depending on current content
-            if tonumber(self.selectedProperty.value) < 1 then
-                self.selectedProperty.value = tonumber(t)
-            else
-                self.selectedProperty.value = tonumber(self.selectedProperty.value .. t)
-            end
-        end
+        -- local errorFlag = false
+
+        -- if tonumber(t) == nil then
+        --     errorFlag = true
+        --     self.modalError = true
+        --     self.modalErrorMessage = "Not a '(Number)' Format"
+        -- elseif tonumber(self.selectedProperty.value .. t) > 2450 then
+        --     errorFlag = true
+        --     self.modalError = true
+        --     self.modalErrorMessage = "Value exceeds limit ( >2450 )"
+        -- end
+
+        -- if not errorFlag then
+        --     -- Append or replace value depending on current content
+        --     if tonumber(self.selectedProperty.value) < 1 then
+        --         self.selectedProperty.value = tonumber(t)
+        --     else
+        --         self.selectedProperty.value = tonumber(self.selectedProperty.value .. t)
+        --     end
+        -- end
+
+        self.tempVal = self.tempVal .. t
     end
 end
-
-
 
 function selection:keypressed(key)
 
     if key == "backspace" then
-        if tonumber(self.selectedProperty.value) < 10 then
-            self.selectedProperty.value = 0
-        else
-            self.selectedProperty.value = tonumber(string.sub(tostring(self.selectedProperty.value), 1, -2))
+        -- if tonumber(self.selectedProperty.value) < 10 then
+        --     self.selectedProperty.value = 0
+        -- else
+        --     self.selectedProperty.value = tonumber(string.sub(tostring(self.selectedProperty.value), 1, -2))
 
+        -- end
+        if string.sub(self.tempVal, 1, -2) ~= nil then
+            self.tempVal = string.sub(self.tempVal, 1, -2)
         end
+
     end
 
     if key == "return" then
-        self.modalBox = false
-        self:modalBoxReset()
+        local func, err = loadstring("return " .. self.tempVal)
+        if func then
+            local success, result = pcall(func)
+            if success then
+                self.selectedProperty.value = result
+                self.modalBox = false
+                self:modalBoxReset()
+            else
+                self.modalError = true
+                self.modalErrorMessage = "Runtime Error [104]: " .. result
+            end
+        else
+            self.modalError = true
+            self.modalErrorMessage = "Invalid Input [104]: " .. err
+        end
+
     end
 end
 
