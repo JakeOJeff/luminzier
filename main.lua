@@ -25,6 +25,13 @@ GLOBAL_VARS = {
 GLOBAL_VARS.canvas.x = GLOBAL_VARS.leftTaskBar.x + GLOBAL_VARS.leftTaskBar.width + 10
 GLOBAL_VARS.canvas.y = 10
 
+
+c = {
+    x = GLOBAL_VARS.canvas.x,
+    y = GLOBAL_VARS.canvas.y,
+    w = GLOBAL_VARS.canvas.width,
+    h = GLOBAL_VARS.canvas.height
+}
 -- GLOBAL FUNCS
 function unpackProperties(propList)
     local props = {}
@@ -68,6 +75,8 @@ function love.load()
 end
 
 function love.update(dt)
+
+    
     selection:update(dt)
     objects:update(dt)
 

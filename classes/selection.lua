@@ -23,7 +23,12 @@ local selection = {
         name = "name",
         value = 0,
         type = "num"
-    }
+    },
+
+    currentPropIndex = 1
+}
+this = {
+    properties = nil
 }
 local tween = require 'packages.tween'
 
@@ -79,6 +84,7 @@ function selection:update(dt)
         self:modalBoxReset()
     end
     if self.child and self.child.properties then
+        this.properties = unpackProperties(self.child.properties)
         for _, prop in ipairs(self.child.properties) do
             if prop.tween then
                 local complete = prop.tween:update(dt)
@@ -180,13 +186,21 @@ function selection:drawModals()
                 lg.printf(valueText, self.modalBoxData.x + 20, self.modalBoxData.y + 40 + errorHeight + 10, -- 10px padding between messages
                     wrapWidth)
             end
+            if self.selectedProperty.type == "string" then
+                local valueText = self.selectedProperty.name .. " Type : " .. self.tempVal
+                lg.printf(valueText, self.modalBoxData.x + 20, self.modalBoxData.y + 40 + errorHeight + 10, -- 10px padding between messages
+                    wrapWidth)
+            end
+            if self.selectedProperty.type == "color" then
+                local valueText = self.selectedProperty.name .. " Type : " .. "{"..self.tempVal[1]..","..self.tempVal[2]..","..self.tempVal[3].."}"
+                lg.printf(valueText, self.modalBoxData.x + 20, self.modalBoxData.y + 40 + errorHeight + 10, -- 10px padding between messages
+                    wrapWidth)
+            end
         else
             -- If no error, draw value at fixed location
             lg.setColor(1, 1, 1)
-            if self.selectedProperty.type == "num" then
-                local valueText = self.selectedProperty.name .. " Value : " .. self.tempVal
-                lg.printf(valueText, self.modalBoxData.x + 20, self.modalBoxData.y + 60, self.modalBoxData.width - 40)
-            end
+            local valueText = self.selectedProperty.name .. " Value : " .. self.tempVal
+            lg.printf(valueText, self.modalBoxData.x + 20, self.modalBoxData.y + 60, self.modalBoxData.width - 40)
         end
 
         -- Close Button
@@ -197,7 +211,7 @@ function selection:drawModals()
 end
 
 function selection:textinput(t)
-    if self.enableInput and self.selectedProperty.type == "num" then
+    if self.enableInput then
 
         -- OLD FORMAT 
 
@@ -221,6 +235,7 @@ function selection:textinput(t)
         --         self.selectedProperty.value = tonumber(self.selectedProperty.value .. t)
         --     end
         -- end
+        self.modalError = false
 
         self.tempVal = self.tempVal .. t
     end
@@ -242,22 +257,42 @@ function selection:keypressed(key)
     end
 
     if key == "return" then
-        local func, err = loadstring("return " .. self.tempVal)
-        if func then
-            local success, result = pcall(func)
-            if success then
-                self.selectedProperty.value = result
-                self.modalBox = false
-                self:modalBoxReset()
+        if self.selectedProperty.type == "num" then
+            local func, err = loadstring("return " .. self.tempVal)
+            if func then
+                local result = func()
+                if result ~= nil then
+                    self.selectedProperty.value = tonumber(result)
+                    -- self.modalBox = false
+                    -- self:modalBoxReset()
+                else
+                    self.modalError = true
+                    self.modalErrorMessage = "Runtime Error [102]"
+                end
             else
                 self.modalError = true
-                self.modalErrorMessage = "Runtime Error [104]: " .. result
+                self.modalErrorMessage = "Invalid Input [104]: " .. err
             end
-        else
-            self.modalError = true
-            self.modalErrorMessage = "Invalid Input [104]: " .. err
+        elseif self.selectedProperty.type == "string" then
+            if self.tempVal ~= nil then
+                if self.tempVal == "line" or self.tempVal == "fill" then
+                    self.selectedProperty.value = self.tempVal
+                else
+                    self.modalError = true
+                    self.modalErrorMessage = "Unidentified Mode [108] : Use 'line' or 'fill' "
+                end
+                
+            else
+                self.modalError = true
+                self.modalErrorMessage = "Invalid Input [104]"                
+            end
         end
 
+    end
+
+    if key == "escape" then
+        self.modalBox = false
+        self:modalBoxReset()
     end
 end
 
