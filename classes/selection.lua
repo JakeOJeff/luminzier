@@ -99,7 +99,7 @@ function selection:modalBoxReset()
     self.modalBox = false
     self.colorInput = {"", "", ""}
     self.colorInputIndex = 1
-
+    self.tempVal = tostring(self.selectedProperty.value)
     self.modalBoxData.x = GLOBAL_VARS.leftTaskBar.x + 35 + GLOBAL_VARS.canvas.width / 2
     self.modalBoxData.y = 10 + GLOBAL_VARS.canvas.height / 2 - 100
     closeButton.x = self.modalBoxData.x + self.modalBoxData.width - self.modalBoxData.height / 5
@@ -197,8 +197,15 @@ end
 function selection:drawValues()
     local valueText = ""
     if self.selectedProperty.type == "num" or self.selectedProperty.type == "string" then
-        valueText = self.selectedProperty.name .. " Value : " .. tostring(self.tempVal)
-        lg.printf(valueText, self.modalBoxData.x + 20, self.modalBoxData.y + 75, self.modalBoxData.width - 40)
+        valueText = self.selectedProperty.name .. " Value : "
+        lg.print(valueText, self.modalBoxData.x + 20, self.modalBoxData.y + 75)
+        lg.setColor(0.5, 0.5, 0.5)
+        lg.rectangle("line", self.modalBoxData.x + 20, self.modalBoxData.y + 95, self.modalBoxData.width - 40,
+            self.modalBoxData.height - 20 - 95)
+
+        lg.setColor(1, 1, 1)
+        lg.printf(tostring(self.tempVal), self.modalBoxData.x + 20, self.modalBoxData.y + 95,
+            self.modalBoxData.width - 40)
     elseif self.selectedProperty.type == "color" then
         local labels = {"R", "G", "B"}
         for i = 1, 3 do
@@ -224,9 +231,9 @@ function selection:drawValues()
         local b = tonumber(self.colorInput[3]) or 0
 
         lg.setColor(r, g, b)
-        lg.rectangle("fill", self.modalBoxData.x + self.modalBoxData.width - 60, self.modalBoxData.y + 20, 40, 40, 6)
+        lg.rectangle("fill", self.modalBoxData.x + self.modalBoxData.width - 60, self.modalBoxData.y + 60, 40, 40, 6)
         lg.setColor(1, 1, 1)
-        lg.rectangle("line", self.modalBoxData.x + self.modalBoxData.width - 60, self.modalBoxData.y + 20, 40, 40, 6)
+        lg.rectangle("line", self.modalBoxData.x + self.modalBoxData.width - 60, self.modalBoxData.y + 60, 40, 40, 6)
     end
 
 end
