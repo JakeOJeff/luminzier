@@ -11,6 +11,9 @@ local selection = {
         height = 200
 
     },
+    colorInput = {"", "", ""},
+    colorInputIndex = 1,
+
     tempVal = 0,
     enableInput = false,
     dragPosition = {
@@ -55,7 +58,6 @@ function selection:load()
         self.modalBox = false
     end
 
-
 end
 
 function selection:update(dt)
@@ -95,6 +97,9 @@ end
 
 function selection:modalBoxReset()
     self.modalBox = false
+    self.colorInput = {"", "", ""}
+    self.colorInputIndex = 1
+
     self.modalBoxData.x = GLOBAL_VARS.leftTaskBar.x + 35 + GLOBAL_VARS.canvas.width / 2
     self.modalBoxData.y = 10 + GLOBAL_VARS.canvas.height / 2 - 100
     closeButton.x = self.modalBoxData.x + self.modalBoxData.width - self.modalBoxData.height / 5
@@ -135,7 +140,7 @@ function selection:draw()
                 self.selectedProperty = prop
                 self:modalBoxReset()
                 self.modalBox = true
-                self.tempVal = self.selectedProperty.value
+
             end
 
             lg.setColor(prop.color)
@@ -175,24 +180,10 @@ function selection:drawModals()
             lg.printf(errorText, self.modalBoxData.x + 20, self.modalBoxData.y + 40, wrapWidth)
 
             lg.setColor(1, 1, 1)
-            local valueText = ""
-            if self.selectedProperty.type == "num" or self.selectedProperty.type == "string" then
-                valueText = self.selectedProperty.name .. " Value : " .. tostring(self.tempVal)
-            elseif self.selectedProperty.type == "color" and type(self.tempVal) == "table" then
-                valueText = self.selectedProperty.name .. " Value : {" .. table.concat(self.tempVal, ", ") .. "}"
-            end
-            lg.printf(valueText, self.modalBoxData.x + 20, self.modalBoxData.y + 75, self.modalBoxData.width - 40)
 
+            selection:drawValues()
         else
-            -- If no error, draw value at fixed location
-            lg.setColor(1, 1, 1)
-            local valueText = ""
-            if self.selectedProperty.type == "num" or self.selectedProperty.type == "string" then
-                valueText = self.selectedProperty.name .. " Value : " .. tostring(self.tempVal)
-            elseif self.selectedProperty.type == "color" and type(self.tempVal) == "table" then
-                valueText = self.selectedProperty.name .. " Value : {" .. table.concat(self.tempVal, ", ") .. "}"
-            end
-            lg.printf(valueText, self.modalBoxData.x + 20, self.modalBoxData.y + 60, self.modalBoxData.width - 40)
+            selection:drawValues()
 
         end
 
@@ -203,68 +194,150 @@ function selection:drawModals()
     end
 end
 
+function selection:drawValues()
+    local valueText = ""
+    if self.selectedProperty.type == "num" or self.selectedProperty.type == "string" then
+        valueText = self.selectedProperty.name .. " Value : " .. tostring(self.tempVal)
+        lg.printf(valueText, self.modalBoxData.x + 20, self.modalBoxData.y + 75, self.modalBoxData.width - 40)
+    elseif self.selectedProperty.type == "color" then
+        local labels = {"R", "G", "B"}
+        for i = 1, 3 do
+            local val = self.colorInput[i]
+            local yOffset = self.modalBoxData.y + 60 + (i - 1) * 30
+            lg.setColor(1, 1, 1)
+            lg.print(labels[i] .. ":", self.modalBoxData.x + 20, yOffset)
+
+            if self.colorInputIndex == i then
+                lg.setColor(0.8, 0.8, 1)
+            else
+                lg.setColor(0.5, 0.5, 0.5)
+            end
+
+            lg.rectangle("line", self.modalBoxData.x + 50, yOffset - 4, 60, 24)
+            lg.setColor(1, 1, 1)
+            lg.print(val, self.modalBoxData.x + 55, yOffset)
+        end
+
+        -- Live color preview
+        local r = tonumber(self.colorInput[1]) or 0
+        local g = tonumber(self.colorInput[2]) or 0
+        local b = tonumber(self.colorInput[3]) or 0
+
+        lg.setColor(r, g, b)
+        lg.rectangle("fill", self.modalBoxData.x + self.modalBoxData.width - 60, self.modalBoxData.y + 20, 40, 40, 6)
+        lg.setColor(1, 1, 1)
+        lg.rectangle("line", self.modalBoxData.x + self.modalBoxData.width - 60, self.modalBoxData.y + 20, 40, 40, 6)
+    end
+
+end
+
 function selection:textinput(t)
-    if self.enableInput then
+    -- if self.enableInput then
 
-        -- OLD FORMAT 
+    --     -- OLD FORMAT 
 
-        -- local errorFlag = false
+    --     -- local errorFlag = false
 
-        -- if tonumber(t) == nil then
-        --     errorFlag = true
-        --     self.modalError = true
-        --     self.modalErrorMessage = "Not a '(Number)' Format"
-        -- elseif tonumber(self.selectedProperty.value .. t) > 2450 then
-        --     errorFlag = true
-        --     self.modalError = true
-        --     self.modalErrorMessage = "Value exceeds limit ( >2450 )"
-        -- end
+    --     -- if tonumber(t) == nil then
+    --     --     errorFlag = true
+    --     --     self.modalError = true
+    --     --     self.modalErrorMessage = "Not a '(Number)' Format"
+    --     -- elseif tonumber(self.selectedProperty.value .. t) > 2450 then
+    --     --     errorFlag = true
+    --     --     self.modalError = true
+    --     --     self.modalErrorMessage = "Value exceeds limit ( >2450 )"
+    --     -- end
 
-        -- if not errorFlag then
-        --     -- Append or replace value depending on current content
-        --     if tonumber(self.selectedProperty.value) < 1 then
-        --         self.selectedProperty.value = tonumber(t)
-        --     else
-        --         self.selectedProperty.value = tonumber(self.selectedProperty.value .. t)
-        --     end
-        -- end
+    --     -- if not errorFlag then
+    --     --     -- Append or replace value depending on current content
+    --     --     if tonumber(self.selectedProperty.value) < 1 then
+    --     --         self.selectedProperty.value = tonumber(t)
+    --     --     else
+    --     --         self.selectedProperty.value = tonumber(self.selectedProperty.value .. t)
+    --     --     end
+    --     -- end
+
+    -- end
+    if self.enableInput and self.selectedProperty.type == "color" then
+        if tonumber(t) or t == "." then -- Allow decimals too
+            self.colorInput[self.colorInputIndex] = self.colorInput[self.colorInputIndex] .. t
+        end
+    elseif self.enableInput then
         self.modalError = false
-
         self.tempVal = self.tempVal .. t
     end
+
 end
 
 function selection:keypressed(key)
+    -- if tonumber(self.selectedProperty.value) < 10 then
+    --     self.selectedProperty.value = 0
+    -- else
+    --     self.selectedProperty.value = tonumber(string.sub(tostring(self.selectedProperty.value), 1, -2))
 
-    if key == "backspace" then
-        -- if tonumber(self.selectedProperty.value) < 10 then
-        --     self.selectedProperty.value = 0
-        -- else
-        --     self.selectedProperty.value = tonumber(string.sub(tostring(self.selectedProperty.value), 1, -2))
+    -- end
 
-        -- end
-        self.tempVal = tostring(self.tempVal)
-        if #self.tempVal > 0 then
-            self.tempVal = self.tempVal:sub(1, -2)
+    if not self.enableInput then
+        return
+    end
+
+    if self.selectedProperty.type == "color" then
+        if key == "space" then
+            if self.colorInputIndex < 3 then
+                self.colorInputIndex = self.colorInputIndex + 1
+            end
+        elseif key == "backspace" then
+            local current = self.colorInput[self.colorInputIndex]
+            if #current > 0 then
+                self.colorInput[self.colorInputIndex] = current:sub(1, -2)
+            elseif self.colorInputIndex > 1 then
+                self.colorInputIndex = self.colorInputIndex - 1
+            end
+        elseif key == "return" then
+            local r = tonumber(self.colorInput[1])
+            local g = tonumber(self.colorInput[2])
+            local b = tonumber(self.colorInput[3])
+
+            if r and g and b and r >= 0 and r <= 1 and g >= 0 and g <= 1 and b >= 0 and b <= 1 then
+                local finalColor = {r, g, b}
+                self.selectedProperty.value = finalColor
+                self.modalError = false
+                self.tempVal = "{" .. r .. ", " .. g .. ", " .. b .. "}"
+            else
+                self.modalError = true
+                self.modalErrorMessage = "Each color must be between 0 and 1"
+            end
+        elseif key == "escape" then
+            self:modalBoxReset()
+        end
+    else
+        if key == "backspace" then
+
+            self.tempVal = tostring(self.tempVal)
+            if #self.tempVal > 0 then
+                self.tempVal = self.tempVal:sub(1, -2)
+            end
+
         end
 
-    end
+        if key == "return" then
+            local parsed, err = parseInput(self.tempVal, self.selectedProperty.type)
+            if parsed then
+                self.selectedProperty.value = parsed
+                self.modalError = false
 
-    if key == "return" then
-        local parsed, err = parseInput(self.tempVal, self.selectedProperty.type)
-        if parsed ~= nil then
-            self.selectedProperty.value = parsed
-            self.modalError = false
-        else
-            self.modalError = true
-            self.modalErrorMessage = "Error: " .. err
+            else
+                self.modalError = true
+                self.modalErrorMessage = "Error: " .. err
+            end
+        end
+
+        if key == "escape" then
+            self.modalBox = false
+            self:modalBoxReset()
         end
     end
 
-    if key == "escape" then
-        self.modalBox = false
-        self:modalBoxReset()
-    end
 end
 
 function selection:mousepressed(x, y, button)
