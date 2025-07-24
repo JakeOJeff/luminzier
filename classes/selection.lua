@@ -177,25 +177,28 @@ function selection:drawModals()
     end
 end
 
--- ERROR AREA
 function selection:textinput(t)
     if self.enableInput then
         local errorFlag = false
-        if not math.tointeger(self.selectedProperty.value) ~= nil then
+
+        if tonumber(self.selectedProperty.value) == nil then
             errorFlag = true
             self.modalError = true
-            self.modalErrorMessage = "Not a '(Integer/Number)' Format"
+            self.modalErrorMessage = "Not a '(Number)' Format"
         end
+
         if not errorFlag then
+            -- Append or replace value depending on current content
             if tonumber(self.selectedProperty.value) < 1 then
                 self.selectedProperty.value = t
             else
                 self.selectedProperty.value = self.selectedProperty.value .. t
             end
         end
-
     end
 end
+
+
 
 function selection:keypressed(key)
 
@@ -206,6 +209,11 @@ function selection:keypressed(key)
             self.selectedProperty.value = tonumber(string.sub(tostring(self.selectedProperty.value), 1, -2))
 
         end
+    end
+
+    if key == "return" then
+        self.modalBox = false
+        self:modalBoxReset()
     end
 end
 
