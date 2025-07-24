@@ -17,7 +17,11 @@ local objects = {
     dragStartX = 0,
     dragStartY = 0,
 
-    itemsList = {require 'items.rectangle', require 'items.circle'},
+    itemsList = {require 'items.rectangle', require 'items.circle', require 'items.lissajous', require 'items.spiral',
+                 require 'items.flower', require 'items.epicycloid', require 'items.hypotrochoid', require 'items.rose',
+                 require 'items.lemniscate', require 'items.butterfly', require 'items.elliptical',
+                 require 'items.noisyCircle', require 'items.chaotic', require 'items.cardioid', require 'items.swirl'},
+
     addItemModalBox = false,
     addItemModalBoxData = {
         x = GLOBAL_VARS.leftTaskBar.width + 5,
