@@ -184,18 +184,22 @@ function selection:textinput(t)
     if self.enableInput and self.selectedProperty.type == "num" then
         local errorFlag = false
 
-        if tonumber(self.selectedProperty.value) == nil then
+        if tonumber(t) == nil then
             errorFlag = true
             self.modalError = true
             self.modalErrorMessage = "Not a '(Number)' Format"
+        elseif tonumber(self.selectedProperty.value .. t) > 2450 then
+            errorFlag = true
+            self.modalError = true
+            self.modalErrorMessage = "Value exceeds limit ( >2450 )"
         end
 
         if not errorFlag then
             -- Append or replace value depending on current content
             if tonumber(self.selectedProperty.value) < 1 then
-                self.selectedProperty.value = t
+                self.selectedProperty.value = tonumber(t)
             else
-                self.selectedProperty.value = self.selectedProperty.value .. t
+                self.selectedProperty.value = tonumber(self.selectedProperty.value .. t)
             end
         end
     end

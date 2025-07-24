@@ -17,7 +17,7 @@ function drawElements:checkRect(obj)
         local mx, my = love.mouse.getPosition()
         love.graphics.setColor(props.color)
 
-        if inBox(mx, my, cv.x + props.x, cv.y + props.y, props.width, props.height) then
+        if inBox(mx, my, cv.x + props.x, cv.y + props.y, props.width, props.height) and not selection.modalBox  then
             if love.mouse.isDown(1) then
                 objects.clickedChild = obj
                 objects:scrollToChild(obj)
@@ -33,10 +33,10 @@ function drawElements:checkCirc(obj)
     if obj.name == "Circle" then
         local props = unpackProperties(obj.properties)
         local mx, my = love.mouse.getPosition()
-
         love.graphics.setColor(props.color)
+print("radius:", props.radius, "x:", props.x, "y:", props.y)
 
-        if inCircle(mx, my, cv.x + props.radius + props.x, cv.y + props.radius + props.y, props.radius) then
+        if inCircle(mx, my, cv.x + props.radius + props.x, cv.y + props.radius + props.y, props.radius) and not selection.modalBox then
             if love.mouse.isDown(1) then
                 objects.clickedChild = obj
                 objects:scrollToChild(obj)
