@@ -55,11 +55,7 @@ function selection:load()
         self.modalBox = false
     end
 
-    for _, child in ipairs(self.selectedProperty) do
-        child.color = {0.4, 0.4, 0.4}
-        child.tween = nil
-        child.isHovered = false
-    end
+
 end
 
 function selection:update(dt)
@@ -176,31 +172,28 @@ function selection:drawModals()
             local _, wrappedText = lg.getFont():getWrap(errorText, wrapWidth)
             local errorHeight = #wrappedText * lg.getFont():getHeight()
 
-            -- Draw the wrapped error text
             lg.printf(errorText, self.modalBoxData.x + 20, self.modalBoxData.y + 40, wrapWidth)
 
-            -- Now draw the value text BELOW the error text, using the height calculated
             lg.setColor(1, 1, 1)
-            if self.selectedProperty.type == "num" then
-                local valueText = self.selectedProperty.name .. " Value : " .. self.tempVal
-                lg.printf(valueText, self.modalBoxData.x + 20, self.modalBoxData.y + 40 + errorHeight + 10, -- 10px padding between messages
-                    wrapWidth)
+            local valueText = ""
+            if self.selectedProperty.type == "num" or self.selectedProperty.type == "string" then
+                valueText = self.selectedProperty.name .. " Value : " .. tostring(self.tempVal)
+            elseif self.selectedProperty.type == "color" and type(self.tempVal) == "table" then
+                valueText = self.selectedProperty.name .. " Value : {" .. table.concat(self.tempVal, ", ") .. "}"
             end
-            if self.selectedProperty.type == "string" then
-                local valueText = self.selectedProperty.name .. " Type : " .. self.tempVal
-                lg.printf(valueText, self.modalBoxData.x + 20, self.modalBoxData.y + 40 + errorHeight + 10, -- 10px padding between messages
-                    wrapWidth)
-            end
-            if self.selectedProperty.type == "color" then
-                local valueText = self.selectedProperty.name .. " Type : " .. "{"..self.tempVal[1]..","..self.tempVal[2]..","..self.tempVal[3].."}"
-                lg.printf(valueText, self.modalBoxData.x + 20, self.modalBoxData.y + 40 + errorHeight + 10, -- 10px padding between messages
-                    wrapWidth)
-            end
+            lg.printf(valueText, self.modalBoxData.x + 20, self.modalBoxData.y + 75, self.modalBoxData.width - 40)
+
         else
             -- If no error, draw value at fixed location
             lg.setColor(1, 1, 1)
-            local valueText = self.selectedProperty.name .. " Value : " .. self.tempVal
+            local valueText = ""
+            if self.selectedProperty.type == "num" or self.selectedProperty.type == "string" then
+                valueText = self.selectedProperty.name .. " Value : " .. tostring(self.tempVal)
+            elseif self.selectedProperty.type == "color" and type(self.tempVal) == "table" then
+                valueText = self.selectedProperty.name .. " Value : {" .. table.concat(self.tempVal, ", ") .. "}"
+            end
             lg.printf(valueText, self.modalBoxData.x + 20, self.modalBoxData.y + 60, self.modalBoxData.width - 40)
+
         end
 
         -- Close Button
@@ -250,44 +243,22 @@ function selection:keypressed(key)
         --     self.selectedProperty.value = tonumber(string.sub(tostring(self.selectedProperty.value), 1, -2))
 
         -- end
-        if string.sub(self.tempVal, 1, -2) ~= nil then
-            self.tempVal = string.sub(self.tempVal, 1, -2)
+        self.tempVal = tostring(self.tempVal)
+        if #self.tempVal > 0 then
+            self.tempVal = self.tempVal:sub(1, -2)
         end
 
     end
 
     if key == "return" then
-        if self.selectedProperty.type == "num" then
-            local func, err = loadstring("return " .. self.tempVal)
-            if func then
-                local result = func()
-                if result ~= nil then
-                    self.selectedProperty.value = tonumber(result)
-                    -- self.modalBox = false
-                    -- self:modalBoxReset()
-                else
-                    self.modalError = true
-                    self.modalErrorMessage = "Runtime Error [102]"
-                end
-            else
-                self.modalError = true
-                self.modalErrorMessage = "Invalid Input [104]: " .. err
-            end
-        elseif self.selectedProperty.type == "string" then
-            if self.tempVal ~= nil then
-                if self.tempVal == "line" or self.tempVal == "fill" then
-                    self.selectedProperty.value = self.tempVal
-                else
-                    self.modalError = true
-                    self.modalErrorMessage = "Unidentified Mode [108] : Use 'line' or 'fill' "
-                end
-                
-            else
-                self.modalError = true
-                self.modalErrorMessage = "Invalid Input [104]"                
-            end
+        local parsed, err = parseInput(self.tempVal, self.selectedProperty.type)
+        if parsed ~= nil then
+            self.selectedProperty.value = parsed
+            self.modalError = false
+        else
+            self.modalError = true
+            self.modalErrorMessage = "Error: " .. err
         end
-
     end
 
     if key == "escape" then
@@ -326,4 +297,46 @@ function selection:mousereleased(x, y, button)
         self.modalBoxDragging = false
     end
 end
+
+function parseInput(value, expectedType)
+    if expectedType == "num" then
+        local func, err = loadstring("return " .. value)
+        if func then
+            local result = func()
+            if type(result) == "number" then
+                return result
+            else
+                return nil, "Expected a number but got " .. tostring(result)
+            end
+        else
+            return nil, "Invalid expression: " .. err
+        end
+
+    elseif expectedType == "string" then
+        if value == "line" or value == "fill" then
+            return value
+        else
+            return nil, "Mode must be 'line' or 'fill'"
+        end
+
+    elseif expectedType == "color" then
+        local func, err = loadstring("return " .. value)
+        if func then
+            local result = func()
+            if type(result) == "table" and #result == 3 then
+                for i = 1, 3 do
+                    if type(result[i]) ~= "number" or result[i] < 0 or result[i] > 1 then
+                        return nil, "Color values must be numbers between 0 and 1"
+                    end
+                end
+                return result
+            else
+                return nil, "Expected format: {r, g, b} (e.g., {1, 0.5, 0})"
+            end
+        else
+            return nil, "Invalid table syntax: " .. err
+        end
+    end
+end
+
 return selection
