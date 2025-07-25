@@ -22,7 +22,7 @@ Here are some variables you may use ( No math in colour! )
 ### Number Properties
 
 Type in a math Value or an expression, for example :
-- `c.w/2 - this.properties.width/` ( Centers the rectangle on the X axis )
+- `c.w/2 - this.properties.width/2` ( Centers the rectangle on the X axis )
 
 Press 'Enter' to set the value.
 
