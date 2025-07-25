@@ -38,9 +38,10 @@ Press 'Enter' to set the value.
 
 Type in a number between 0 - 1 and press 'space' to go the next box. After all three boxes are filled, press 'Enter' to set the value.
 
-## Extra Notes
+## Extra Notes [ IMPORTANT ]
 
 - Changes in 'rx' or 'ry' may not be seen until both of them are edited as they work together.
+- For Simple errors, it will be displayed on top of the textbox. If it seems critical or harmful to the software, it will show you a blue screen with the error message on it. This is a way of protecting the software since it is exposed to the user through the endpoint. You can just close it and restart it like normal.
 
 <div align="center">
   <a href="https://shipwrecked.hackclub.com/?t=ghrm" target="_blank">
