@@ -25,6 +25,7 @@ Type in a math Value or an expression, for example :
 - `c.w/2 - this.properties.width/2` ( Centers the rectangle on the X axis )
 
 Press 'Enter' to set the value.
+<img width="1086" height="635" alt="image" src="https://github.com/user-attachments/assets/f9cbf35b-0cd1-481f-9f54-e700d25e4588" />
 
 ### String Properties
 
@@ -33,10 +34,12 @@ There are two variables for String Values
  - line : To make a outlined shape
 
 Press 'Enter' to set the value.
+<img width="638" height="399" alt="image" src="https://github.com/user-attachments/assets/7e55a93d-e42b-44cd-ac2d-a5ac80bff5ec" />
 
 ### Color Properties
 
 Type in a number between 0 - 1 and press 'space' to go the next box. After all three boxes are filled, press 'Enter' to set the value.
+<img width="589" height="490" alt="image" src="https://github.com/user-attachments/assets/2307b68c-f9e7-4146-9688-4f41ef26d916" />
 
 ## Extra Notes [ IMPORTANT ]
 
