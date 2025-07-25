@@ -1,5 +1,43 @@
 # luminzier
 
+A drawing app based on math and variables!
+
+## Guide
+
+- Create an Object by clicking on the '+' button on the left taskbar and select a shape.
+- The variables of the shape will be visible when selected. You can click on it and edit them
+- Type either a number or, be fun with it, do MATH.
+- You have access to all the variables in the Software ( most of them atleast ), and some variables defined just for you.
+
+## Variables 
+
+Here are some variables you may use ( No math in colour! )
+
+- (c) - { x, y, width, height } : Canvas Values
+- (this) - { properties - { list of properties } } : Returns the property value of the current selected object
+- ( More Coming Soon )
+
+## How to use
+
+### Number Properties
+
+Type in a math Value or an expression, for example :
+- `c.w/2 - this.properties.width/` ( Centers the rectangle on the X axis )
+
+Press 'Enter' to set the value.
+
+### String Properties
+
+There are two variables for String Values
+ - fill : To make a filled shape
+ - line : To make a outlined shape
+
+Press 'Enter' to set the value.
+
+### Color Properties
+
+Type in a number between 0 - 1 and press 'space' to go the next box. After all three boxes are filled, press 'Enter' to set the value.
+
 
 
 <div align="center">
