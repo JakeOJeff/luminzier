@@ -336,7 +336,7 @@ function objects:mousepressed(x, y, button)
         local i = 0
         local itemY = self.addItemModalBoxData.y + 5
         for _, item in pairs(self.itemsList) do
-            if inBox(x, y, self.addItemModalBoxData.x + 5, itemY + (22 * i) + 5, self.addItemModalBoxData.width - 10, 20) then
+            if inBox(x, y, self.addItemModalBoxData.x + 5, itemY + (_ - 1) * (20 + 5), self.addItemModalBoxData.width - 10, 20) then
                 if button == 1 then
                     local function cloneItem(item)
                         local propsCopy = {}

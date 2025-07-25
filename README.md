@@ -38,7 +38,9 @@ Press 'Enter' to set the value.
 
 Type in a number between 0 - 1 and press 'space' to go the next box. After all three boxes are filled, press 'Enter' to set the value.
 
+## Extra Notes
 
+- Changes in 'rx' or 'ry' may not be seen until both of them are edited as they work together.
 
 <div align="center">
   <a href="https://shipwrecked.hackclub.com/?t=ghrm" target="_blank">
