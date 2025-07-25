@@ -7,6 +7,7 @@ local rectangle = {
         { name = "width", value = 50, type = "num" },
         { name = "height", value = 50, type = "num" },
         { name = "rx", value = 0, type = "num" },
+        { name = "ry", value = 0, type = "num" },
         { name = "mode", value = "fill", type = "string" },
         { name = "color", value = {0.5, 0.5, 0.5}, type = "color" }
     }

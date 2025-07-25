@@ -17,10 +17,12 @@ local objects = {
     dragStartX = 0,
     dragStartY = 0,
 
-    itemsList = {require 'items.rectangle', require 'items.circle', require 'items.lissajous', require 'items.spiral',
-                 require 'items.flower', require 'items.epicycloid', require 'items.hypotrochoid', require 'items.rose',
-                 require 'items.lemniscate', require 'items.butterfly', require 'items.elliptical',
-                 require 'items.noisyCircle', require 'items.chaotic', require 'items.cardioid', require 'items.swirl'},
+    itemsList = {require 'items.rectangle', require 'items.circle', 
+                -- require 'items.lissajous', require 'items.spiral',
+                --  require 'items.flower', require 'items.epicycloid', require 'items.hypotrochoid', require 'items.rose',
+                --  require 'items.lemniscate', require 'items.butterfly', require 'items.elliptical',
+                --  require 'items.noisyCircle', require 'items.chaotic', require 'items.cardioid', require 'items.swirl'
+                },
 
     addItemModalBox = false,
     addItemModalBoxData = {
@@ -334,7 +336,7 @@ function objects:mousepressed(x, y, button)
         local i = 0
         local itemY = self.addItemModalBoxData.y + 5
         for _, item in pairs(self.itemsList) do
-            if inBox(x, y, self.addItemModalBoxData.x + 5, itemY + (20 * i) + 5, self.addItemModalBoxData.width - 10, 20) then
+            if inBox(x, y, self.addItemModalBoxData.x + 5, itemY + (22 * i) + 5, self.addItemModalBoxData.width - 10, 20) then
                 if button == 1 then
                     local function cloneItem(item)
                         local propsCopy = {}
